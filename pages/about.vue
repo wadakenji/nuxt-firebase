@@ -1,7 +1,7 @@
 <template>
   <section>
     <h1>About</h1>
-    <a href="/">To Index</a>
+    <nuxt-link to="/">To Index</nuxt-link>
   </section>
 </template>
 
