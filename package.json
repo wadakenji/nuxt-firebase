@@ -4,6 +4,7 @@
   "author": "wadakenji",
   "license": "MIT",
   "dependencies": {
+    "@nuxtjs/dotenv": "^1.4.1",
     "core-js": "2.6.11",
     "firebase": "^7.12.0",
     "firebase-tools": "^7.16.1",
@@ -13,6 +14,8 @@
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
-    "generate": "nuxt generate"
+    "generate": "nuxt generate",
+    "deploy": "firebase deploy",
+    "functions": "cd functions && npm run build && cd .. && firebase emulators:start --only functions"
   }
 }
