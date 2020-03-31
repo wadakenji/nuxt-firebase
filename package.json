@@ -16,6 +16,11 @@
     "start": "nuxt start",
     "generate": "nuxt generate",
     "deploy": "firebase deploy",
+    "deploy-functions": "firebase deploy --only functions",
+    "deploy-except-functions": "firebase deploy --except functions",
     "functions": "cd functions && npm run build && cd .. && firebase emulators:start --only functions"
+  },
+  "devDependencies": {
+    "@nuxtjs/vuetify": "^1.11.0"
   }
 }

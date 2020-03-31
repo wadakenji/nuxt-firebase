@@ -9,6 +9,6 @@ export default ({ redirect, store }) => {
         email: user.email,
         displayName: user.displayName,
       })
-    else redirect('/auth')
+    else redirect('/auth/sign-in')
   })
 }

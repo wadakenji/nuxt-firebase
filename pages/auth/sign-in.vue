@@ -1,16 +1,28 @@
 <template>
   <section>
-    <h1>Sign In</h1>
-    <form action="" v-on:submit.prevent="onSubmit">
-      <label for="email">e-mail</label>
-      <input type="email" id="email" v-model="email" />
-      <label for="password">password</label>
-      <input type="password" id="password" v-model="password" />
-      <button type="submit">Sing In</button>
-    </form>
-    <div v-if="result">
-      {{ result }}
-    </div>
+    <v-row align="center" class="flex-column">
+      <h1>ログイン</h1>
+      <v-form class="mb-6">
+        <v-text-field v-model="email" type="email" label="e-mail" required />
+        <v-text-field
+          v-model="password"
+          type="password"
+          label="password"
+          required
+        />
+        <v-btn @click="onSubmit">ログイン</v-btn>
+      </v-form>
+      <v-alert
+        v-if="error"
+        type="error"
+        style="white-space: pre-line"
+        class="mb-6"
+        >{{ error }}
+      </v-alert>
+      <v-btn to="/auth/sign-up" outlined color="#000080"
+        >新規登録はこちら
+      </v-btn>
+    </v-row>
   </section>
 </template>
 
@@ -22,7 +34,7 @@ export default {
   data: () => ({
     email: '',
     password: '',
-    result: '',
+    error: '',
   }),
   methods: {
     async onSubmit() {
@@ -30,17 +42,14 @@ export default {
         .auth()
         .signInWithEmailAndPassword(this.email, this.password)
         .then(r => {
-          this.$router.push('/auth/secret')
+          this.$router.push('/')
         })
         .catch(e => {
-          const errorCode = e.code
-          const errorMessage = e.message
+          const { code, message } = e
 
-          this.result = `code:${errorCode} message:${errorMessage}`
+          this.error = `${code}\n${message}`
         })
     },
   },
 }
 </script>
-
-<style scoped></style>
