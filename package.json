@@ -15,10 +15,12 @@
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
-    "deploy": "firebase deploy",
+    "deploy": "yarn build && firebase deploy",
     "deploy-functions": "firebase deploy --only functions",
     "deploy-except-functions": "firebase deploy --except functions",
-    "functions": "cd functions && npm run build && cd .. && firebase emulators:start --only functions"
+    "build-functions": "cd functions && npm run build && cd .. ",
+    "functions": "yarn build-functions && firebase emulators:start --only functions",
+    "serve": "yarn build && yarn build-functions && firebase serve"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.11.0"

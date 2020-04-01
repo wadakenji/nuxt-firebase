@@ -1,24 +1,28 @@
 import * as functions from 'firebase-functions'
-import * as express from 'express'
+import * as admin from 'firebase-admin'
 
-export const helloWorld = functions.https.onRequest((request, response) => {
-  response.send('Hello from Firebase!')
+if (process.env.NODE_ENV !== 'production') require('dotenv').config()
+
+admin.initializeApp({
+  credential: admin.credential.applicationDefault(),
+  databaseURL: 'https://project-id.firebaseio.com',
 })
 
-export const helloOnCall = functions.https.onCall((data, context) => {
-  console.log(data)
-  console.log('test')
-  return data
-})
+const db = admin.firestore()
 
-const app = express()
+export const updateUserStatus = functions.https.onCall(
+  async (data: number, context) => {
+    //ログインしてなければエラー
+    if (!context.auth) throw new Error('Sign-in is required.')
 
-app.get('/', (req, res) => {
-  res.send('GET OK!')
-})
+    const { uid } = context.auth
 
-app.post('/', (req, res) => {
-  res.send('POST OK!')
-})
-
-export const helloExpress = functions.https.onRequest(app)
+    //firestoreをupdate
+    return await db
+      .collection('users')
+      .doc(uid)
+      .update({ status: data })
+      .then(r => r)
+      .catch(e => e)
+  }
+)

@@ -90,3 +90,5 @@ sw.*
 *.swp
 
 .firebase
+
+service-account-file.json
