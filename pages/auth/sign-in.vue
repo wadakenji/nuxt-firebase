@@ -46,7 +46,6 @@ export default {
         })
         .catch(e => {
           const { code, message } = e
-
           this.error = `${code}\n${message}`
         })
     },

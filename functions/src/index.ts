@@ -5,24 +5,23 @@ if (process.env.NODE_ENV !== 'production') require('dotenv').config()
 
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
-  databaseURL: 'https://project-id.firebaseio.com',
+  databaseURL: 'https://nuxt-firebase-c523f.firebaseio.com',
 })
 
 const db = admin.firestore()
 
-export const updateUserStatus = functions.https.onCall(
-  async (data: number, context) => {
-    //ログインしてなければエラー
-    if (!context.auth) throw new Error('Sign-in is required.')
+export const updateUser = functions.https.onCall(async (data, context) => {
+  //ログインしてなければエラー
+  if (!context.auth)
+    throw new functions.https.HttpsError('failed-precondition', 'errorrr.')
 
-    const { uid } = context.auth
+  const { uid } = context.auth
 
-    //firestoreをupdate
-    return await db
-      .collection('users')
-      .doc(uid)
-      .update({ status: data })
-      .then(r => r)
-      .catch(e => e)
-  }
-)
+  //firestoreをupdate
+  return await db
+    .collection('users')
+    .doc(uid)
+    .update(data)
+    .then(r => r)
+    .catch(e => e)
+})
