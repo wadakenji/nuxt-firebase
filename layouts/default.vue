@@ -1,8 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar max-height="64px">
-      ヘッダー
-    </v-app-bar>
+    <VHeader />
     <v-content>
       <v-container>
         <nuxt />
@@ -13,3 +11,13 @@
     </v-footer>
   </v-app>
 </template>
+
+<script>
+import VHeader from '../components/VHeader'
+
+export default {
+  components: {
+    VHeader,
+  },
+}
+</script>

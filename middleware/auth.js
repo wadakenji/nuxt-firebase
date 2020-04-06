@@ -1,14 +1,26 @@
 import firebase from '@/plugins/firebase'
 
 export default ({ redirect, store }) => {
-  firebase.auth().onAuthStateChanged(user => {
-    // console.log(user)
-    if (user)
+  firebase.auth().onAuthStateChanged(async user => {
+    if (user) {
+      const { uid, email, displayName } = user
+
+      const team = await firebase
+        .firestore()
+        .collection('users')
+        .doc(uid)
+        .get()
+        .then(doc => doc.data().team)
+
       store.commit('auth/setUser', {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
+        uid: uid,
+        email: email,
+        displayName: displayName,
+        team: team,
       })
-    else redirect('/auth/sign-in')
+    } else {
+      store.commit('auth/setUser', null)
+      redirect('/auth/sign-in')
+    }
   })
 }

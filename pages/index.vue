@@ -63,10 +63,6 @@ import common from '@/const/common'
 
 const db = firebase.firestore()
 const usersRef = db.collection('users')
-const functions = firebase.functions()
-
-if (process.env.NODE_ENV !== 'production')
-  functions.useFunctionsEmulator('http://localhost:5001')
 
 export default {
   name: 'index',
@@ -76,28 +72,39 @@ export default {
     USER_STATUS: common.USER_STATUS,
     task: '',
   }),
-  mounted() {
-    usersRef.onSnapshot(snapshot => {
-      console.log(snapshot.docChanges())
-      this.users = this.getUsers()
-    })
+  computed: {
+    //現在のログインユーザーを返す
+    currentUser() {
+      return this.$store.state.auth.user
+    },
   },
-  methods: {
-    getUsers() {
-      const users = []
-      usersRef.get().then(snapshot => {
+  watch: {
+    currentUser: function(newVal, oldVal) {
+      if (!newVal) return []
+
+      const { team } = newVal
+      usersRef.where('team', '==', team).onSnapshot(snapshot => {
+        this.users = []
         snapshot.forEach(doc => {
-          users.push({ id: doc.id, ...doc.data() })
+          this.users.push({ id: doc.id, ...doc.data() })
         })
       })
-      return users
     },
+  },
+  methods: {
     updateStatus(status) {
-      functions.httpsCallable('updateUser')({ status: status })
+      this.updateUser({ status: status })
     },
     updateTask() {
-      functions.httpsCallable('updateUser')({ task: this.task })
+      this.updateUser({ task: this.task })
       this.task = ''
+    },
+    updateUser(data) {
+      const { uid } = this.currentUser
+      usersRef
+        .doc(uid)
+        .update(data)
+        .catch(e => console.log(e))
     },
   },
 }
