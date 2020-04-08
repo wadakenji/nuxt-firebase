@@ -5,18 +5,19 @@ export default ({ redirect, store }) => {
     if (user) {
       const { uid, email, displayName } = user
 
-      const team = await firebase
+      const { teamId, teamName } = await firebase
         .firestore()
         .collection('users')
         .doc(uid)
         .get()
-        .then(doc => doc.data().team)
+        .then(doc => doc.data())
 
       store.commit('auth/setUser', {
         uid: uid,
         email: email,
         displayName: displayName,
-        team: team,
+        teamId: teamId,
+        teamName: teamName,
       })
     } else {
       store.commit('auth/setUser', null)

@@ -23,7 +23,7 @@
           item-text="name"
           item-value="id"
           label="所属チーム"
-          v-model="team"
+          v-model="teamId"
           class="col-12"
         ></v-select>
         <v-btn @click="onSubmit">新規登録</v-btn>
@@ -54,7 +54,7 @@ export default {
     email: '',
     password: '',
     name: '',
-    team: '',
+    teamId: '',
     error: '',
   }),
   asyncData: () => {
@@ -68,30 +68,31 @@ export default {
   },
   methods: {
     async onSubmit() {
-      if (!this.email || !this.password || !this.name || !this.team) {
+      if (!this.email || !this.password || !this.name || !this.teamId) {
         this.error = 'INPUT ALL VALUE!'
         return
       }
       //ユーザーの新規作成
-      firebase
+      await firebase
         .auth()
         .createUserWithEmailAndPassword(this.email, this.password)
-        .then(r => {
+        .then(async r => {
           const { uid, email } = r.user
           //成功していたら、ユーザーのdisplayNameを更新する
-          firebase
+          await firebase
             .auth()
             .currentUser.updateProfile({ displayName: this.name })
             .catch(e => console.log(e))
 
           //成功していたら、firestoreにユーザーデータを作成する
-          usersRef.doc(uid).set({
+          await usersRef.doc(uid).set({
             displayName: this.name,
             email: email,
-            team: this.team,
+            teamId: this.teamId,
+            teamName: this.teams.find(t => t.id === this.teamId).name,
           })
 
-          this.$router.push('/')
+          await this.$router.push('/')
         })
         .catch(e => {
           const { code, message } = e
