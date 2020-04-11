@@ -1,8 +1,8 @@
 <template>
   <section>
     <h1 v-if="currentUser">{{ currentUser.teamName }}</h1>
-    <v-layout>
-      <div class="col-4 px-6">
+    <v-layout class="flex-column flex-md-row">
+      <v-col class="px-6" cols="12" md="4">
         <v-card-title>なう</v-card-title>
         <v-row>
           <v-card
@@ -13,13 +13,17 @@
             <div class="col-12 mb-2">
               <v-card-title>ステータスを更新</v-card-title>
               <v-row justify="center">
-                <v-btn @click="changeStatus(USER_STATUS.WORKING)" class="mr-3"
+                <v-btn
+                  @click="changeStatus(USER_STATUS.WORKING)"
+                  class="mr-3 mb-3"
                   >仕事中
                 </v-btn>
-                <v-btn @click="changeStatus(USER_STATUS.BREAK)" class="mr-3"
+                <v-btn
+                  @click="changeStatus(USER_STATUS.BREAK)"
+                  class="mr-3 mb-3"
                   >休憩中
                 </v-btn>
-                <v-btn @click="changeStatus(USER_STATUS.OFF)" class="mr-3"
+                <v-btn @click="changeStatus(USER_STATUS.OFF)" class="mr-3 mb-3"
                   >終了
                 </v-btn>
               </v-row>
@@ -38,8 +42,12 @@
             </div>
           </v-card>
         </v-row>
-        <v-row class="flex-column">
-          <v-card v-for="user in users" v-bind:key="user.uid" class="mb-3 py-3">
+        <v-row class="flex-column flex-sm-row flex-md-column" justify="center">
+          <v-card
+            v-for="user in users"
+            v-bind:key="user.uid"
+            class="col-12 col-sm-3 col-md-12 mb-3 py-3 mr-3"
+          >
             <v-card-title class="py-2">{{ user.displayName }}</v-card-title>
             <v-list-item>
               <v-chip color="indigo lighten-4" v-show="user.status === 0"
@@ -62,9 +70,10 @@
             </v-list-item>
           </v-card>
         </v-row>
-      </div>
+      </v-col>
+      <v-divider class="my-6"></v-divider>
       <v-divider vertical></v-divider>
-      <div class="col-4 px-6">
+      <v-col class="px-6" cols="12" md="4">
         <v-card-title>困った</v-card-title>
         <v-row>
           <v-card
@@ -128,9 +137,10 @@
             </v-btn>
           </v-card>
         </v-row>
-      </div>
+      </v-col>
+      <v-divider class="my-6"></v-divider>
       <v-divider vertical></v-divider>
-      <div class="col-4 px-6">
+      <v-col class="px-6" cols="12" md="4">
         <v-row>
           <v-card-title>独り言</v-card-title>
           <v-card
@@ -156,7 +166,7 @@
             </div>
           </div>
         </v-row>
-      </div>
+      </v-col>
     </v-layout>
   </section>
 </template>
