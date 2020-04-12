@@ -20,12 +20,21 @@
         <v-text-field v-model="name" label="表示名" class="col-12" required />
         <v-select
           :items="teams"
+          @change="setWillCreateTeam"
           item-text="name"
           item-value="id"
           label="所属チーム"
           v-model="teamId"
           class="col-12"
         ></v-select>
+        <v-text-field
+          v-if="willCreateTeam"
+          v-model="newTeamName"
+          type="text"
+          label="チーム名"
+          required
+          class="col-12"
+        />
         <v-btn @click="onSubmit">新規登録</v-btn>
       </v-form>
       <v-alert
@@ -55,10 +64,12 @@ export default {
     password: '',
     name: '',
     teamId: '',
+    willCreateTeam: false,
+    newTeamName: '',
     error: '',
   }),
   asyncData: () => {
-    const teams = []
+    const teams = [{ id: null, name: '新しいチームを作成する' }]
     teamsRef.get().then(snapshot => {
       snapshot.forEach(doc => {
         teams.push({ id: doc.id, ...doc.data() })
@@ -68,29 +79,32 @@ export default {
   },
   methods: {
     async onSubmit() {
-      if (!this.email || !this.password || !this.name || !this.teamId) {
+      if (
+        !this.email ||
+        !this.password ||
+        !this.name ||
+        (!this.willCreateTeam && !this.teamId) ||
+        (this.willCreateTeam && !this.newTeamName)
+      ) {
         this.error = 'INPUT ALL VALUE!'
         return
       }
+
+      //新しいチームをつくるならばfirestoreに追加する
+      if (this.willCreateTeam) {
+        await this.createTeam()
+      }
+
       //ユーザーの新規作成
       await firebase
         .auth()
         .createUserWithEmailAndPassword(this.email, this.password)
         .then(async r => {
-          const { uid, email } = r.user
           //成功していたら、ユーザーのdisplayNameを更新する
-          await firebase
-            .auth()
-            .currentUser.updateProfile({ displayName: this.name })
-            .catch(e => console.log(e))
+          await this.updateUserDisplayName()
 
           //成功していたら、firestoreにユーザーデータを作成する
-          await usersRef.doc(uid).set({
-            displayName: this.name,
-            email: email,
-            teamId: this.teamId,
-            teamName: this.teams.find(t => t.id === this.teamId).name,
-          })
+          await this.createUserOnData(r.user)
 
           await this.$router.push('/')
         })
@@ -98,6 +112,31 @@ export default {
           const { code, message } = e
           this.error = `${code}\n${message}`
         })
+    },
+    async updateUserDisplayName() {
+      await firebase
+        .auth()
+        .currentUser.updateProfile({ displayName: this.name })
+        .catch(e => console.log(e))
+    },
+    async createUserOnData({ uid, email }) {
+      await usersRef.doc(uid).set({
+        displayName: this.name,
+        email: email,
+        teamId: this.teamId,
+        teamName: this.willCreateTeam
+          ? this.newTeamName
+          : this.teams.find(t => t.id === this.teamId).name,
+        teamAdmin: this.willCreateTeam,
+      })
+    },
+    async createTeam() {
+      await teamsRef
+        .add({ name: this.newTeamName })
+        .then(r => (this.teamId = r.id))
+    },
+    setWillCreateTeam() {
+      this.willCreateTeam = !this.teamId
     },
   },
 }

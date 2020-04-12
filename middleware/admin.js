@@ -21,6 +21,8 @@ export default ({ redirect, store }) => {
         teamAdmin: !!teamAdmin,
         systemAdmin: !!systemAdmin,
       })
+
+      if (!systemAdmin) redirect('/')
     } else {
       store.commit('auth/setUser', null)
       redirect('/auth/sign-in')
